@@ -3,4 +3,83 @@
 3、注意launch.json文件的program和prelaunchtask(自动化调试的key)
 4、task.json中的Build与launch.json中的prelaunchtask配合，实现自动化调试
 5、还要注意CMakeLists.txt文件的set(CMAKE_BUILD_TYPE Debug),而不是set(CMAKE_BUILD_TYPE Release),不然调试不了的
+6、launch.json文件示例
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "g++ - 生成和调试活动文件",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++: g++ 生成活动文件",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
 
+
+7、task.json文件示例
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "options": {
+        "cwd": "${workspaceFolder}/build"
+    },
+    "tasks": [
+        {
+            "label": "cmake",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                ".."
+            ]
+         
+        },
+        {
+"label": "make",
+"group": {
+    "kind": "build",
+    "isDefault": true
+},
+"command":"make",
+"args": [
+
+]
+        },
+        {
+            "label": "Build",
+            "dependsOrder": "sequence",//按列出顺序执行任务依赖项
+            "dependsOn":[
+                "cmake",
+                "make"
+            
+            ]
+        }
+
+        
+    ]
+}
+//task.json，三个label，后面两个label依赖于前两个，第一个代表cmake ..命令，第二个代表build，最后一个sequence代表按顺序执行前两个label，将最后一个；abel的Build复制到launch.json文件上的prelaunchtask中，实现自动化调试
